@@ -90,11 +90,19 @@ function createWindow() {
     try {
       const [data1, data2] = await Promise.all([
         
+        // 舊方法 可能棄用改用新的
         // fetchYahooFutureJSON("WTX00") ,
         // fetchYahooFutureJSON("WTX%26")
 
-        getFutureData("WTX00").then(({ data }) => getJSONData(data)),
-        getFutureData("WTX%26").then(({ data }) => getJSONData(data))
+        getFutureData("WTX00").then(({ data }) => getJSONData(data)).catch(err => {
+          console.error("抓取 WTX00 失敗:", err.message);
+          return null;
+        }),
+        getFutureData("WTX%26").then(({ data }) => getJSONData(data)).catch(err => {
+          console.error("抓取 WTX%26 失敗:", err.message);
+          return null;
+        })
+
       ]);
       console.log("抓取成功:", data1, data2);
 

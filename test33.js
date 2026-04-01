@@ -48,34 +48,47 @@ if (pridMatch) {
 
 
 /**
- * 
- * @param {*} symbol 
- * @returns 
+ * 這是直接抓取主數據 的函式，還在測試階段，未來可能會整合到 main.js 裡，或者改成更簡單的接口。
  */
-async function getFutureData(symbol = "WTX%26") {
+async function getFutureData(symbol = "WTX%26", retryCount = 3) {
   const url = `https://tw.stock.yahoo.com/_td-stock/api/resource/FinanceChartService.ApacLibraCharts;symbols=["${symbol}"];type=tick?bkt=twstock-pc-lumosv2-migration-rampup&device=desktop&ecma=modern&feature=enableGAMAds,enableGAMEdgeToEdge,enableEvPlayer,useCG,useCGV2,useLumosV2Stock&intl=tw&lang=zh-Hant-TW&partner=none&region=TW&site=finance&tz=Asia/Taipei&ver=1.4.837&returnMeta=true`;
 
-  const res = await fetch(url, {
-    headers: {
-      "User-Agent": "Mozilla/5.0",
-      "Accept": "application/json"
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0",
+        "Accept": "application/json"
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
     }
-  });
 
-  const data = await res.json();
+    const data = await res.json();
+    return { data };
 
-  // API 回傳的 meta 裡面通常會有 prid
+  } catch (err) {
+    console.error("抓取失敗:", err.message);
 
-  return { data };
+    if (retryCount > 0) {
+      console.log("2 秒後重試...");
+      await new Promise(r => setTimeout(r, 2000));
+      return getFutureData(symbol, retryCount - 1);
+    } else {
+      throw new Error("多次重試仍失敗");
+    }
+  }
 }
 
+
 // 測試
-getFutureData("WTX%26").then(({ prid, data }) => {
-  console.log("抓到 prid:", prid);
-  console.log("股價資料:", data);
-}).catch(err => {
-  console.error("抓取失敗:", err);
-});
+// getFutureData("WTX%26").then(({ prid, data }) => {
+//   console.log("抓到 prid:", prid);
+//   console.log("股價資料:", data);
+// }).catch(err => {
+//   console.error("抓取失敗:", err);
+// });
 
 
 module.exports = { getPrid,getFutureData };
