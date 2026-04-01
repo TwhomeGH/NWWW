@@ -38,7 +38,7 @@ function createChart(ctx, titleText, yLabel) {
           tension: 0.4 ,     // 曲線更柔和
           yAxisID: 'y1',
           datalabels: {   // ✅ 改成 datalabels
-          anchor: 'top',
+          anchor: 'end',
           align: 'left'  , // ✅ 現貨顯示在上方
          
           offset: 12,   // ✅ 第一組用 6px 的偏移，避免和第二組重疊
@@ -59,14 +59,21 @@ function createChart(ctx, titleText, yLabel) {
           fill: false, 
           spanGaps: true,
           datalabels: {   // ✅ 改成 datalabels
-            anchor: 'top',
-            align: 'left'  , // ✅ 近一顯示在下方
+            anchor: 'end',
+            align: 'top'  , // ✅ 近一顯示在下方
             offset: 12 , // ✅ 第二組用 2px 的偏移，避免和第一組重疊
             
-            formatter: (value, context) => {
-              // ✅ 只顯示最後一筆
-              return context.dataIndex === context.dataset.data.length - 2 ? value : '';
+           formatter: (value, context) => {
+            const len = context.dataset.data.length;
+            if (len < 20) {
+              // 資料少 → 顯示倒數第 2 筆
+              return context.dataIndex === len - 2 ? value : '';
+            } else {
+              // 資料多 → 改顯示最後一筆
+              return context.dataIndex === len - 1 ? value : '';
             }
+          }
+
           },
           pointRadius: 3,   // 點更大
           borderWidth: 3,   // 線更粗
