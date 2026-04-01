@@ -7,7 +7,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const changeCtx = document.getElementById('changeChart').getContext('2d');
   const percentCtx = document.getElementById('percentChart').getContext('2d');
 
-  const MAX_POINTS = 100; // ✅ 只顯示最新 100 筆資料
+  const MAX_POINTS = 200; // ✅ 只顯示最新 200 筆資料
 
 
 
@@ -163,6 +163,29 @@ function updateYAxisRange(chart, datasetIndexes) {
   }
 }
 
+function getMaxPoints(chart) {
+  const chartWidth = chart.width;
+  const pointWidth = 20;
+  const maxByWidth = Math.floor(chartWidth / pointWidth);
+
+  return Math.min(MAX_POINTS, Math.max(20, maxByWidth));
+}
+
+
+
+function getMaxTicks(chart) {
+  const chartHeight = chart.height;
+  const tickHeight = 10; // 每個刻度大約佔 10px
+  return Math.floor(chartHeight / tickHeight);
+}
+
+function applyAdaptiveTicks(chart) {
+  const maxTicks = getMaxTicks(chart);
+  chart.options.scales.y.ticks.maxTicksLimit = maxTicks;
+}
+
+
+
 
 function pushData(chart, label, spotVal, nearVal) {
   if (spotVal !== null) chart.data.datasets[0].data.push(spotVal);
@@ -183,10 +206,15 @@ function pushData(chart, label, spotVal, nearVal) {
     }
   }
 
-  if (chart.data.labels.length > MAX_POINTS) {
-    chart.data.labels.shift();
-    chart.data.datasets.forEach(ds => ds.data.shift());
-  }
+  // ✅ 自適應 MAX_POINTS
+  const maxPoints = getMaxPoints(chart);
+  
+  chart.data.labels = chart.data.labels.slice(-maxPoints);
+  chart.data.datasets.forEach(ds => {
+    ds.data = ds.data.slice(-maxPoints);
+  });
+
+
 
   // ✅ 自動更新正確的 Y 軸範圍
   if (chart === priceChart) {
@@ -207,8 +235,11 @@ function pushData(chart, label, spotVal, nearVal) {
     const now = new Date().toLocaleTimeString();
 
     pushData(priceChart, now, parseFloat(data.price), null);
+    applyAdaptiveTicks(priceChart);
     pushData(changeChart, now, parseFloat(data.change), null);
+    applyAdaptiveTicks(changeChart);
     pushData(percentChart, now, parseFloat(data.changePercent), null);
+    applyAdaptiveTicks(percentChart);
 
     // ✅ 統一一次更新
     [priceChart, changeChart, percentChart].forEach(c => c.update());
@@ -221,8 +252,11 @@ function pushData(chart, label, spotVal, nearVal) {
     const now = new Date().toLocaleTimeString();
 
     pushData(priceChart, now, null, parseFloat(data.price));
+    applyAdaptiveTicks(priceChart);
     pushData(changeChart, now, null, parseFloat(data.change));
+    applyAdaptiveTicks(changeChart);
     pushData(percentChart, now, null, parseFloat(data.changePercent));
+    applyAdaptiveTicks(percentChart);
 
     // ✅ 統一一次更新
     [priceChart, changeChart, percentChart].forEach(c => c.update());

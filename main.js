@@ -7,6 +7,8 @@ const { getPrid ,getFutureData } = require('./test33.js'); // ✅ 引入 getPrid
 
 
 let intervalId; // 全域變數，方便清理
+var useSimulatedData = false; // ✅ 切換是否使用模擬資料
+
 
 
 
@@ -93,8 +95,6 @@ function getJSONData(data) {
     changePercent: quote.changePercent
   };
 }
-
-var useSimulatedData = false; // ✅ 切換是否使用模擬資料
 
 
 
