@@ -1,7 +1,7 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const fetch = require('node-fetch');
-const cheerio = require('cheerio');
+//const cheerio = require('cheerio'); // ✅ 已經改用 JSON API，不需要 cheerio 了
 
 let intervalId; // 全域變數，方便清理
 
