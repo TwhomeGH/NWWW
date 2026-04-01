@@ -127,19 +127,19 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
 
-
 function updateYAxisRange(chart, datasetIndexes) {
   const allData = datasetIndexes
     .flatMap(i => chart.data.datasets[i].data)
     .filter(v => v !== null);
 
   if (allData.length > 0) {
-    const minVal = Math.min(...allData.slice(-100));
-    const maxVal = Math.max(...allData.slice(-100));
+    const minVal = Math.min(...allData);
+    const maxVal = Math.max(...allData);
     chart.options.scales.y.min = minVal;
     chart.options.scales.y.max = maxVal;
   }
 }
+
 
 function pushData(chart, label, spotVal, nearVal) {
   if (spotVal !== null) chart.data.datasets[0].data.push(spotVal);
