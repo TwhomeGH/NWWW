@@ -8,7 +8,9 @@ window.addEventListener('DOMContentLoaded', () => {
   const percentCtx = document.getElementById('percentChart').getContext('2d');
 
   const MAX_POINTS = 500; // ✅ 只顯示最新 500 筆資料
-  const MIN_RANGE = 50; // 最小顯示範圍
+
+  const MAX_RANGE = 500;  // ✅ 最大顯示範圍
+  const MIN_RANGE = 100; // 最小顯示範圍
 
 
 function createChart(ctx, titleText, yLabel) {
@@ -69,7 +71,16 @@ function createChart(ctx, titleText, yLabel) {
         }
       },
       scales: {
-        x: { offset: true, ticks: { autoSkip: true, maxTicksLimit: 10, color: '#000' }, title: { display: true, text: '時間', color: '#000' } },
+        x: { 
+           ticks: { 
+            autoSkip: true,  maxTicksLimit: Math.max(5, Math.floor(window.innerWidth / 80))  // ✅ 根據視窗寬度決定顯示刻度
+            , color: '#000' 
+
+           }, 
+          
+        
+          
+        title: { display: true, text: '時間', color: '#000' } },
         y: { title: { display: true, text: yLabel, color: '#000' }, ticks: { color: '#000', padding: 10 }, beginAtZero: false }
       }
     },
@@ -173,7 +184,7 @@ function pushData(chart, label, value1, value2, paddingRatio) {
   if (validData.length > 0) {
     const minVal = Math.min(...validData);
     const maxVal = Math.max(...validData);
-    const range = Math.max(maxVal - minVal, MIN_RANGE);
+    const range = Math.max(Math.min(maxVal - minVal, MAX_RANGE), MIN_RANGE);
 
     chart.options.scales.y.min = minVal - range * paddingRatio;
     chart.options.scales.y.max = maxVal + range * paddingRatio;
