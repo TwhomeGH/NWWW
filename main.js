@@ -57,6 +57,26 @@ async function fetchYahooFutureJSON(symbol) {
   };
 }
 
+
+function mockQuoteData(name, basePrice = 30000) {
+  // 隨機波動 ±200
+  const spot = basePrice + (Math.random() - 0.5) * 400;
+  const near = spot + (Math.random() - 0.5) * 200;
+
+  const change = spot - basePrice;
+  const changePercent = (change / basePrice) * 100;
+
+  return {
+    name,
+    price: spot.toFixed(2),
+    change: change.toFixed(2),
+    changePercent: changePercent.toFixed(2),
+    nearPrice: near.toFixed(2),
+    diff: (spot - near).toFixed(2),
+    diffPercent: (((spot - near) / near) * 100).toFixed(2)
+  };
+}
+
 function getJSONData(data) {
 
  // ✅ 解析 JSON，取出需要的值
@@ -74,6 +94,10 @@ function getJSONData(data) {
   };
 }
 
+var useSimulatedData = false; // ✅ 切換是否使用模擬資料
+
+
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 600,
@@ -88,26 +112,43 @@ function createWindow() {
 
   const fetchData = async () => {
     try {
-      const [data1, data2] = await Promise.all([
-        
-        // 舊方法 可能棄用改用新的
-        // fetchYahooFutureJSON("WTX00") ,
-        // fetchYahooFutureJSON("WTX%26")
 
-        getFutureData("WTX00").then(({ data }) => getJSONData(data)).catch(err => {
+      if (useSimulatedData) {
+        const data1 = mockQuoteData("台指期現貨");
+        const data2 = mockQuoteData("台指期近一", parseFloat(data1.price) + 100); // 近一價格稍微高一點
+        console.log("使用模擬資料:", data1, data2);
+
+      if (data1) win.webContents.send('future-data', data1);
+      if (data2) win.webContents.send('future-data-nt2', data2);
+
+
+      } else {
+
+      const [data1, data2] = await Promise.all([
+         getFutureData("WTX00").then(({ data }) => getJSONData(data)).catch(err => {
           console.error("抓取 WTX00 失敗:", err.message);
           return null;
         }),
+
+        
         getFutureData("WTX%26").then(({ data }) => getJSONData(data)).catch(err => {
           console.error("抓取 WTX%26 失敗:", err.message);
           return null;
         })
 
+       
+
       ]);
-      console.log("抓取成功:", data1, data2);
+
+      
+
+      console.log(`抓取成功正式`, data1, data2);
 
       if (data1) win.webContents.send('future-data', data1);
       if (data2) win.webContents.send('future-data-nt2', data2);
+
+     }
+
     } catch (err) {
       console.error("抓取失敗:", err.message);
     }

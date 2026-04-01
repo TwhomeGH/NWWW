@@ -11,32 +11,54 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 
- function createChart(ctx, titleText, yLabel) {
+function createChart(ctx, titleText, yLabel, showBand = false) {
+  const datasets = [
+    {
+      label: '台指期現貨',
+      data: [],
+      borderColor: '#4e79a7',
+      backgroundColor: 'rgba(78,121,167,0.2)',
+      fill: false,
+      tension: 0.4,
+      yAxisID: 'y'
+    },
+    {
+      label: '台指期近一',
+      data: [],
+      borderColor: '#f28e2b',
+      backgroundColor: 'rgba(242,142,43,0.2)',
+      fill: showBand ? '-1' : false, // ✅ 價格圖才顯示區間帶
+      tension: 0.4,
+      yAxisID: 'y'
+    }
+  ];
+
+  const diffBandPlugin = {
+  id: 'diffBand',
+  beforeDatasetsDraw(chart) {
+    const ctx = chart.ctx;
+    const ds0 = chart.getDatasetMeta(0);
+    const ds1 = chart.getDatasetMeta(1);
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,0,0,0.1)'; // 區間顏色
+
+    ds0.data.forEach((point, i) => {
+      const y0 = point.y;
+      const y1 = ds1.data[i]?.y;
+      if (y1 !== undefined) {
+        ctx.fillRect(point.x, Math.min(y0, y1), 2, Math.abs(y0 - y1));
+      }
+    });
+
+    ctx.restore();
+  }
+};
+
+
   return new Chart(ctx, {
     type: 'line',
-    data: {
-      labels: [],
-      datasets: [
-        {
-          label: '台指期現貨',
-          data: [],
-          borderColor: '#4e79a7',
-          backgroundColor: 'rgba(78,121,167,0.2)', // 現貨顏色帶
-          fill: false,
-          tension: 0.4,
-          yAxisID: 'y'
-        },
-        {
-          label: '台指期近一',
-          data: [],
-          borderColor: '#f28e2b',
-          backgroundColor: 'rgba(242,142,43,0.2)', // 近一顏色帶
-          fill: '-1', // ✅ 自動填滿兩條線之間的區域
-          tension: 0.4,
-          yAxisID: 'y'
-        }
-      ]
-    },
+    data: { labels: [], datasets },
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -58,9 +80,10 @@ window.addEventListener('DOMContentLoaded', () => {
         y: { type: 'linear', position: 'left', title: { display: true, text: yLabel, color: '#000' } }
       }
     },
-    plugins: [ChartDataLabels]
+    plugins: [ChartDataLabels, diffBandPlugin]
   });
 }
+
 
 
 
