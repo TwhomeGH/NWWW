@@ -171,9 +171,9 @@ const MAX_TABLE_ROWS = 20; // 表格最多顯示 20 筆
 
 
 function getStepSize(range) {
-  if (range <= 2) {
+  if (range <= 50) {
     // 小範圍 → 刻度細一點，顯示大約 10~20 個
-    return Math.ceil(range / 10);
+    return Math.ceil(range / 20);
   } else if (range <= 10) {
     // 中等範圍 → 顯示大約 10 個
     return Math.ceil(range / 10);
