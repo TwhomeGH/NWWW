@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self';
+               script-src * 'unsafe-inline' 'unsafe-eval';
+               style-src 'self' 'unsafe-inline';
+               img-src 'self' data:;
+               connect-src *;">
+
+
+    <title>Yahoo 期貨即時行情</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .chart-container {
+            flex: 2;
+            /* 每個 chart 平均分配高度 */
+            min-height: 150px;
+            /* 設定最小高度，避免太小看不清楚 */
+            box-sizing: border-box;
+            padding: 5px;
+            overflow: hidden;
+            /* 避免 canvas 超出容器 */
+        }
+
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* 明亮模式 */
+        body.light {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        /* 暗色模式 */
+        body.dark {
+            background-color: #121212;
+            color: #ffffff;
+        }
+
+        #toggleTheme,
+        #resetZoom {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            margin-left: 10px;
+            padding: 6px 12px;
+            cursor: pointer;
+        }
+
+        #resetZoom {
+            right: 130px;
+            /* 讓它在左邊 */
+        }
+
+        /* ✅ 新增原始數值板塊樣式 */
+
+
+/* 原始數值板塊容器 */
+.raw-data {
+  flex: 1; /* ✅ 原始數值區塊佔比較少空間 */
+ 
+  padding: 10px;
+  border-top: 2px solid #ccc;
+  background-color: rgba(240, 240, 240, 0.8);
+  overflow-y: auto;       /* ✅ 垂直滾動，避免溢出 */
+  box-sizing: border-box;
+}
+
+/* 表格 */
+#rawDataTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  table-layout: fixed;    /* ✅ 固定欄寬 */
+}
+
+/* 表頭與內容 */
+#rawDataTable th,
+#rawDataTable td {
+  border: 1px solid #ccc;
+  padding: 6px;
+  text-align: center;
+  white-space: nowrap;    /* ✅ 不換行，避免撐開 */
+  overflow: hidden;       /* ✅ 超出隱藏 */
+  text-overflow: ellipsis;/* ✅ 超出顯示省略號 */
+}
+
+/* 表頭背景 */
+#rawDataTable th {
+  background-color: #f0f0f0;
+}
+
+/* 欄位寬度比例 */
+#rawDataTable th:nth-child(1),
+#rawDataTable td:nth-child(1) { width: 15%; }
+#rawDataTable th:nth-child(2),
+#rawDataTable td:nth-child(2) { width: 25%; }
+#rawDataTable th:nth-child(3),
+#rawDataTable td:nth-child(3) { width: 20%; }
+#rawDataTable th:nth-child(4),
+#rawDataTable td:nth-child(4) { width: 20%; }
+#rawDataTable th:nth-child(5),
+#rawDataTable td:nth-child(5) { width: 20%; }
+
+/* 正負數顏色 */
+.value-positive {
+  color: green;
+  font-weight: bold;
+}
+.value-negative {
+  color: red;
+  font-weight: bold;
+}
+
+/* ✅ 暗色模式適配 */
+body.dark .raw-data {
+  background-color: rgba(30,30,30,0.9);
+  border-top: 2px solid #444;
+}
+
+body.dark #rawDataTable th {
+  background-color: #333;
+  color: #fff;
+  border: 1px solid #555;
+}
+
+body.dark #rawDataTable td {
+  color: #ddd;
+  border: 1px solid #555;
+}
+
+body.dark #rawDataTable td.value-positive {
+  color: #4caf50;
+}
+body.dark #rawDataTable td.value-negative {
+  color: #f44336;
+}
+
+
+
+
+
+    </style>
+</head>
+
+<body class="light">
+    <button id="toggleTheme">切換暗色模式</button>
+    <button id="resetZoom">重置縮放</button>
+
+    <div class="chart-container"><canvas id="priceChart"></canvas></div>
+    <div class="chart-container"><canvas id="changeChart"></canvas></div>
+    <div class="chart-container"><canvas id="percentChart"></canvas></div>
+
+    <!-- ✅ 新增原始數值板塊 -->
+   <div id="rawDataContainer" class="raw-data">
+  
+ <table id="rawDataTable">
+  <thead>
+    <tr>
+      <th>來源</th>
+      <th>時間</th>
+      <th>價格</th>
+      <th>漲跌</th>
+      <th>漲幅%</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- 第一組、第二組各自固定一行 -->
+  </tbody>
+</table>
+
+</div>
+
+
+
+
+    <script src="./renderer.js"></script>
+</body>
+
+</html>
