@@ -191,9 +191,13 @@ function pushData(chart, label, value1, value2, paddingRatio) {
     // 如果差異太大，限制最大範圍
     if (range > 200) range = 20;
 
+    chart.options.scales.y.min = minVal - (range * paddingRatio);
+    chart.options.scales.y.max = maxVal + (range * paddingRatio);
+    chart.options.scales.y.ticks.stepSize = range / 2; // ✅ 動態調整刻度間距
 
-    chart.options.scales.y.min = minVal - range * paddingRatio;
-    chart.options.scales.y.max = maxVal + range * paddingRatio;
+    
+    console.log(`更新範圍: min=${minVal}, max=${maxVal}, range=${range} padding=${range * paddingRatio}`);
+
 
   
   }
@@ -209,9 +213,9 @@ window.api.onFutureData((data) => {
   const now = new Date().toLocaleTimeString();
   console.log("第一組資料:", data);
 
-  pushData(priceChart, now, data.price, priceChart.data.datasets[1].data.at(-1) ?? null, 0.1);
-  pushData(changeChart, now, data.change, changeChart.data.datasets[1].data.at(-1) ?? null, 0.1);
-  pushData(percentChart, now, data.changePercent, percentChart.data.datasets[1].data.at(-1) ?? null, 0.1);
+  pushData(priceChart, now, data.price, priceChart.data.datasets[1].data.at(-1) ?? null, 1.5);
+  pushData(changeChart, now, data.change, changeChart.data.datasets[1].data.at(-1) ?? null, 1.5);
+  pushData(percentChart, now, data.changePercent, percentChart.data.datasets[1].data.at(-1) ?? null, 1.5);
 
 
   updateRawTable('台指期現貨', now, data);
@@ -223,9 +227,9 @@ window.api.onFutureDataNT2((data) => {
   const now = new Date().toLocaleTimeString();
   console.log("第二組資料:", data);
 
-  pushData(priceChart, now, priceChart.data.datasets[0].data.at(-1) ?? null, data.price, 0.1);
-  pushData(changeChart, now, changeChart.data.datasets[0].data.at(-1) ?? null, data.change, 0.1);
-  pushData(percentChart, now, percentChart.data.datasets[0].data.at(-1) ?? null, data.changePercent, 0.1);
+  pushData(priceChart, now, priceChart.data.datasets[0].data.at(-1) ?? null, data.price, 1.5);
+  pushData(changeChart, now, changeChart.data.datasets[0].data.at(-1) ?? null, data.change, 1.5);
+  pushData(percentChart, now, percentChart.data.datasets[0].data.at(-1) ?? null, data.changePercent, 1.5);
 
   updateRawTable('台指期近一', now, data);
 });
