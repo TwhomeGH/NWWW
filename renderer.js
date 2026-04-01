@@ -187,9 +187,9 @@ function pushData(chart, label, value1, value2, paddingRatio) {
     let range = maxVal - minVal || 1;
 
     // 如果差異太小，強制放大
-    if (range < 5) range = 20;   // ✅ 小差異強制展開 20
+    if (range < 5) range = 10;   // ✅ 小差異強制展開 20
     // 如果差異太大，限制最大範圍
-    if (range > 300) range = 300;
+    if (range > 200) range = 20;
 
 
     chart.options.scales.y.min = minVal - range * paddingRatio;
