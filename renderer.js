@@ -209,9 +209,9 @@ window.api.onFutureData((data) => {
   const now = new Date().toLocaleTimeString();
   console.log("第一組資料:", data);
 
-  pushData(priceChart, now, data.price, priceChart.data.datasets[1].data.at(-1) ?? null, 0.05);
-  pushData(changeChart, now, data.change, changeChart.data.datasets[1].data.at(-1) ?? null, 0.05);
-  pushData(percentChart, now, data.changePercent, percentChart.data.datasets[1].data.at(-1) ?? null, 0.05);
+  pushData(priceChart, now, data.price, priceChart.data.datasets[1].data.at(-1) ?? null, 0.1);
+  pushData(changeChart, now, data.change, changeChart.data.datasets[1].data.at(-1) ?? null, 0.1);
+  pushData(percentChart, now, data.changePercent, percentChart.data.datasets[1].data.at(-1) ?? null, 0.1);
 
 
   updateRawTable('台指期現貨', now, data);
@@ -223,9 +223,9 @@ window.api.onFutureDataNT2((data) => {
   const now = new Date().toLocaleTimeString();
   console.log("第二組資料:", data);
 
-  pushData(priceChart, now, priceChart.data.datasets[0].data.at(-1) ?? null, data.price, 0.5);
-  pushData(changeChart, now, changeChart.data.datasets[0].data.at(-1) ?? null, data.change, 0.2);
-  pushData(percentChart, now, percentChart.data.datasets[0].data.at(-1) ?? null, data.changePercent, 0.2);
+  pushData(priceChart, now, priceChart.data.datasets[0].data.at(-1) ?? null, data.price, 0.1);
+  pushData(changeChart, now, changeChart.data.datasets[0].data.at(-1) ?? null, data.change, 0.1);
+  pushData(percentChart, now, percentChart.data.datasets[0].data.at(-1) ?? null, data.changePercent, 0.1);
 
   updateRawTable('台指期近一', now, data);
 });
