@@ -187,13 +187,13 @@ function pushData(chart, label, value1, value2, paddingRatio) {
     let range = maxVal - minVal || 1;
 
     // 如果差異太小，強制放大
-    if (range < 5) range = 10;   // ✅ 小差異強制展開 20
+    if (range < 5) range = 20;   // ✅ 小差異強制展開 20
     // 如果差異太大，限制最大範圍
-    if (range > 200) range = 20;
+    if (range > 200) range = 50;
 
     chart.options.scales.y.min = minVal - (range * paddingRatio);
     chart.options.scales.y.max = maxVal + (range * paddingRatio);
-    chart.options.scales.y.ticks.stepSize = range / 2; // ✅ 動態調整刻度間距
+    chart.options.scales.y.ticks.stepSize = range / 1; // ✅ 動態調整刻度間距
 
     
     console.log(`更新範圍: min=${minVal}, max=${maxVal}, range=${range} padding=${range * paddingRatio}`);
