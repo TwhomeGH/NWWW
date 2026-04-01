@@ -189,7 +189,7 @@ function pushData(chart, label, value1, value2, paddingRatio) {
     // 如果差異太小，強制放大
     if (range < 5) range = 20;   // ✅ 小差異強制展開 20
     // 如果差異太大，限制最大範圍
-    if (range > 500) range = 500;
+    if (range > 300) range = 300;
 
 
     chart.options.scales.y.min = minVal - range * paddingRatio;
@@ -209,9 +209,9 @@ window.api.onFutureData((data) => {
   const now = new Date().toLocaleTimeString();
   console.log("第一組資料:", data);
 
-  pushData(priceChart, now, data.price, priceChart.data.datasets[1].data.at(-1) ?? null, 0.1);
-  pushData(changeChart, now, data.change, changeChart.data.datasets[1].data.at(-1) ?? null, 0.1);
-  pushData(percentChart, now, data.changePercent, percentChart.data.datasets[1].data.at(-1) ?? null, 0.1);
+  pushData(priceChart, now, data.price, priceChart.data.datasets[1].data.at(-1) ?? null, 0.05);
+  pushData(changeChart, now, data.change, changeChart.data.datasets[1].data.at(-1) ?? null, 0.05);
+  pushData(percentChart, now, data.changePercent, percentChart.data.datasets[1].data.at(-1) ?? null, 0.05);
 
 
   updateRawTable('台指期現貨', now, data);
