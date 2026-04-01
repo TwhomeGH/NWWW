@@ -50,7 +50,7 @@ if (pridMatch) {
 /**
  * 這是直接抓取主數據 的函式，還在測試階段，未來可能會整合到 main.js 裡，或者改成更簡單的接口。
  */
-async function getFutureData(symbol = "WTX%26", retryCount = 3) {
+async function getFutureData(symbol = "WTX%26", retryCount = 3, delay = 2000) {
   const url = `https://tw.stock.yahoo.com/_td-stock/api/resource/FinanceChartService.ApacLibraCharts;symbols=["${symbol}"];type=tick?bkt=twstock-pc-lumosv2-migration-rampup&device=desktop&ecma=modern&feature=enableGAMAds,enableGAMEdgeToEdge,enableEvPlayer,useCG,useCGV2,useLumosV2Stock&intl=tw&lang=zh-Hant-TW&partner=none&region=TW&site=finance&tz=Asia/Taipei&ver=1.4.837&returnMeta=true`;
 
   try {
@@ -69,17 +69,18 @@ async function getFutureData(symbol = "WTX%26", retryCount = 3) {
     return { data };
 
   } catch (err) {
-    console.error("抓取失敗:", err.message);
+    console.error(`抓取失敗: ${err.message}`);
 
     if (retryCount > 0) {
-      console.log("2 秒後重試...");
-      await new Promise(r => setTimeout(r, 2000));
-      return getFutureData(symbol, retryCount - 1);
+      console.log(`等待 ${delay / 1000} 秒後重試...`);
+      await new Promise(r => setTimeout(r, delay));
+      return getFutureData(symbol, retryCount - 1, delay * 2); // 延遲加倍
     } else {
       throw new Error("多次重試仍失敗");
     }
   }
 }
+
 
 
 // 測試
