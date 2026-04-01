@@ -2,7 +2,7 @@ const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const fetch = require('node-fetch');
 //const cheerio = require('cheerio'); // ✅ 已經改用 JSON API，不需要 cheerio 了
-const { getPrid } = require('./test33.js'); // ✅ 引入 getPrid 函式
+const { getPrid ,getFutureData } = require('./test33.js'); // ✅ 引入 getPrid 函式
 
 
 
@@ -15,9 +15,8 @@ let intervalId; // 全域變數，方便清理
 // ✅ 直接抓 Yahoo JSON API
 async function fetchYahooFutureJSON(symbol) {
 
-  const prid = await getPrid(symbol);
-  console.log(`取得 prid: ${prid}，準備抓取 ${symbol} 的資料...`);
-  const url = `https://tw.stock.yahoo.com/_td-stock/api/resource/FinanceChartService.ApacLibraCharts;symbols=%5B%22${symbol}%22%5D;type=tick?bkt=twstock-pc-lumosv2-migration-rampup&device=desktop&ecma=modern&feature=enableGAMAds%2CenableGAMEdgeToEdge%2CenableEvPlayer%2CuseCG%2CuseCGV2%2CuseLumosV2Stock&intl=tw&lang=zh-Hant-TW&partner=none&region=TW&site=finance&tz=Asia%2FTaipei&ver=1.4.837&returnMeta=true&prid=${prid}`;
+ 
+  const url = `https://tw.stock.yahoo.com/_td-stock/api/resource/FinanceChartService.ApacLibraCharts;symbols=["${symbol}"];type=tick?bkt=twstock-pc-lumosv2-migration-rampup&device=desktop&ecma=modern&feature=enableGAMAds%2CenableGAMEdgeToEdge%2CenableEvPlayer%2CuseCG%2CuseCGV2%2CuseLumosV2Stock&intl=tw&lang=zh-Hant-TW&partner=none&region=TW&site=finance&tz=Asia%2FTaipei&ver=1.4.837&returnMeta=true`;
 
   const response = await fetch(url, 
     {
@@ -58,6 +57,22 @@ async function fetchYahooFutureJSON(symbol) {
   };
 }
 
+function getJSONData(data) {
+
+ // ✅ 解析 JSON，取出需要的值
+  const chart = data?.data?.[0]?.chart;
+  const quote = chart?.quote;
+  if (!chart || !chart.indicators) return null;
+  if (!quote) return null;
+
+
+  return {
+    name: chart.meta?.name,
+    price: quote.price,
+    change: quote.change,
+    changePercent: quote.changePercent
+  };
+}
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -74,8 +89,12 @@ function createWindow() {
   const fetchData = async () => {
     try {
       const [data1, data2] = await Promise.all([
-        fetchYahooFutureJSON("WTX00") ,
-        fetchYahooFutureJSON("WTX%26")
+        
+        // fetchYahooFutureJSON("WTX00") ,
+        // fetchYahooFutureJSON("WTX%26")
+
+        getFutureData("WTX00").then(({ data }) => getJSONData(data)),
+        getFutureData("WTX%26").then(({ data }) => getJSONData(data))
       ]);
       console.log("抓取成功:", data1, data2);
 

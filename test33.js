@@ -34,7 +34,7 @@ async function getPrid(symbol = "WTX%26") {
 
 const DATA = await RES2.text();
 
-//console.log("抓取成功:", DATA);
+console.log("抓取成功:", DATA);
 
 
 const pridMatch = DATA.match(/"prid":"([^"]+)"/);
@@ -47,7 +47,51 @@ if (pridMatch) {
 }
 
 
-module.exports = { getPrid };
+/**
+ * 
+ * @param {*} symbol 
+ * @returns 
+ */
+async function getFutureData(symbol = "WTX%26") {
+  const url = `https://tw.stock.yahoo.com/_td-stock/api/resource/FinanceChartService.ApacLibraCharts;symbols=["${symbol}"];type=tick?bkt=twstock-pc-lumosv2-migration-rampup&device=desktop&ecma=modern&feature=enableGAMAds,enableGAMEdgeToEdge,enableEvPlayer,useCG,useCGV2,useLumosV2Stock&intl=tw&lang=zh-Hant-TW&partner=none&region=TW&site=finance&tz=Asia/Taipei&ver=1.4.837&returnMeta=true`;
 
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent": "Mozilla/5.0",
+      "Accept": "application/json"
+    }
+  });
+
+  const data = await res.json();
+
+  // API 回傳的 meta 裡面通常會有 prid
+
+  return { data };
+}
+
+// 測試
+getFutureData("WTX%26").then(({ prid, data }) => {
+  console.log("抓到 prid:", prid);
+  console.log("股價資料:", data);
+}).catch(err => {
+  console.error("抓取失敗:", err);
+});
+
+
+module.exports = { getPrid,getFutureData };
+
+
+// getFutureData("WTX%26").then(({ data }) => {
+//   console.log("股價資料:", data);
+// }).catch(err => {
+//   console.error("抓取失敗:", err);
+// });
+
+// // 測試用
+// getPrid("WTX%26").then(prid => {
+//   console.log("測試完成，prid =", prid);
+// }).catch(err => {
+//   console.error("測試失敗:", err);
+// });
 
 
