@@ -168,6 +168,21 @@ function updateRawTable(sourceName, now, data) {
 
 const MAX_TABLE_ROWS = 20; // 表格最多顯示 20 筆
 
+
+
+function getStepSize(range) {
+  if (range <= 20) {
+    // 小範圍 → 刻度細一點，顯示大約 10~20 個
+    return Math.ceil(range / 10);
+  } else if (range <= 100) {
+    // 中等範圍 → 顯示大約 10 個
+    return Math.ceil(range / 10);
+  } else {
+    // 大範圍 → 刻度疏一點，顯示大約 5 個
+    return Math.ceil(range / 5);
+  }
+}
+
 function pushData(chart, label, value1, value2, paddingRatio) {
   chart.data.labels.push(label);
 
@@ -193,12 +208,11 @@ function pushData(chart, label, value1, value2, paddingRatio) {
 
     chart.options.scales.y.min = minVal - (range * paddingRatio);
     chart.options.scales.y.max = maxVal + (range * paddingRatio);
-    chart.options.scales.y.ticks.stepSize = range / 1; // ✅ 動態調整刻度間距
 
+    // 保持大約 10 個刻度
+    chart.options.scales.y.ticks.stepSize = getStepSize(range);
     
     console.log(`更新範圍: min=${minVal}, max=${maxVal}, range=${range} padding=${range * paddingRatio}`);
-
-
   
   }
 
