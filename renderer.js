@@ -9,8 +9,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
   const MAX_POINTS = 500; // ✅ 只顯示最新 500 筆資料
 
-  const MAX_RANGE = 500;  // ✅ 最大顯示範圍
-  const MIN_RANGE = 100; // 最小顯示範圍
+  const MAX_RANGE = 5;  // ✅ 最大顯示範圍
+  const MIN_RANGE = 5; // 最小顯示範圍
 
 
 function createChart(ctx, titleText, yLabel) {
@@ -184,7 +184,13 @@ function pushData(chart, label, value1, value2, paddingRatio) {
   if (validData.length > 0) {
     const minVal = Math.min(...validData);
     const maxVal = Math.max(...validData);
-    const range = Math.max(Math.min(maxVal - minVal, MAX_RANGE), MIN_RANGE);
+    let range = maxVal - minVal || 1;
+
+    // 如果差異太小，強制放大
+    if (range < 5) range = 20;   // ✅ 小差異強制展開 20
+    // 如果差異太大，限制最大範圍
+    if (range > 500) range = 500;
+
 
     chart.options.scales.y.min = minVal - range * paddingRatio;
     chart.options.scales.y.max = maxVal + range * paddingRatio;
@@ -203,9 +209,10 @@ window.api.onFutureData((data) => {
   const now = new Date().toLocaleTimeString();
   console.log("第一組資料:", data);
 
-  pushData(priceChart, now, data.price, priceChart.data.datasets[1].data.at(-1) ?? null, 0.5);
-  pushData(changeChart, now, data.change, changeChart.data.datasets[1].data.at(-1) ?? null, 0.2);
-  pushData(percentChart, now, data.changePercent, percentChart.data.datasets[1].data.at(-1) ?? null, 0.2);
+  pushData(priceChart, now, data.price, priceChart.data.datasets[1].data.at(-1) ?? null, 0.1);
+  pushData(changeChart, now, data.change, changeChart.data.datasets[1].data.at(-1) ?? null, 0.1);
+  pushData(percentChart, now, data.changePercent, percentChart.data.datasets[1].data.at(-1) ?? null, 0.1);
+
 
   updateRawTable('台指期現貨', now, data);
 });
