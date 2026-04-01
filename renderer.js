@@ -126,12 +126,14 @@ function createChart(ctx, titleText, yLabel) {
  
 
   // ✅ 更新原始數值表格
- function updateRawTable(sourceName, now, data) {
+function updateRawTable(sourceName, now, data) {
   const tableBody = document.querySelector('#rawDataTable tbody');
   const changeClass = data.change >= 0 ? 'value-positive' : 'value-negative';
   const percentClass = data.changePercent >= 0 ? 'value-positive' : 'value-negative';
+  const priceClass = data.price >= 0 ? 'value-positive' : 'value-negative'; // ✅ 新增價格判斷
   const changeArrow = data.change >= 0 ? '▲' : '▼';
   const percentArrow = data.changePercent >= 0 ? '▲' : '▼';
+  const priceArrow = data.price >= 0 ? '▲' : '▼'; // ✅ 新增價格箭頭
 
   // ✅ 找到對應的 row，如果沒有就建立
   let row = tableBody.querySelector(`tr[data-source="${sourceName}"]`);
@@ -145,7 +147,7 @@ function createChart(ctx, titleText, yLabel) {
   row.innerHTML = `
     <td>${sourceName}</td>
     <td>${now}</td>
-    <td>${data.price}</td>
+    <td class="${priceClass}">${priceArrow} ${data.price}</td>   <!-- ✅ 價格依正負顯示 -->
     <td class="${changeClass}">${changeArrow} ${data.change}</td>
     <td class="${percentClass}">${percentArrow} ${data.changePercent}</td>
   `;
@@ -182,33 +184,7 @@ function pushData(chart, label, value1, value2, paddingRatio) {
   chart.update();
 }
 
-// ✅ 更新原始數值表格，限制最多 MAX_TABLE_ROWS
-function updateRawTable(sourceName, now, data) {
-  const tableBody = document.querySelector('#rawDataTable tbody');
-  const changeClass = data.change >= 0 ? 'value-positive' : 'value-negative';
-  const percentClass = data.changePercent >= 0 ? 'value-positive' : 'value-negative';
-  const changeArrow = data.change >= 0 ? '▲' : '▼';
-  const percentArrow = data.changePercent >= 0 ? '▲' : '▼';
 
-  let row = tableBody.querySelector(`tr[data-source="${sourceName}"]`);
-  if (!row) {
-    row = document.createElement('tr');
-    row.setAttribute('data-source', sourceName);
-    tableBody.appendChild(row);
-  }
-  row.innerHTML = `
-    <td>${sourceName}</td>
-    <td>${now}</td>
-    <td>${data.price}</td>
-    <td class="${changeClass}">${changeArrow} ${data.change}</td>
-    <td class="${percentClass}">${percentArrow} ${data.changePercent}</td>
-  `;
-
-  // ✅ 限制表格最多顯示 MAX_TABLE_ROWS
-  while (tableBody.rows.length > MAX_TABLE_ROWS) {
-    tableBody.deleteRow(0);
-  }
-}
 
 // 第一組
 window.api.onFutureData((data) => {
