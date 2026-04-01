@@ -1,4 +1,4 @@
-# Yacho期權圖表查看
+# Yachoo期權圖表查看
 
 這是用Electron打包的一個形化介面
 
