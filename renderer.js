@@ -128,17 +128,30 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 
-  function pushData(chart, label, spotVal, nearVal) {
+function updateYAxisRange(chart, datasetIndexes) {
+  const allData = datasetIndexes
+    .flatMap(i => chart.data.datasets[i].data)
+    .filter(v => v !== null);
+
+  if (allData.length > 0) {
+    const minVal = Math.min(...allData.slice(-100));
+    const maxVal = Math.max(...allData.slice(-100));
+    chart.options.scales.y.min = minVal;
+    chart.options.scales.y.max = maxVal;
+  }
+}
+
+function pushData(chart, label, spotVal, nearVal) {
   if (spotVal !== null) chart.data.datasets[0].data.push(spotVal);
   if (nearVal !== null) chart.data.datasets[1].data.push(nearVal);
 
   chart.data.labels.push(label);
 
-  const latestSpot = chart.data.datasets[0].data.at(-1);
-  const latestNear = chart.data.datasets[1].data.at(-1);
-
-  // ✅ 只有有第三個 dataset 時才算差值
+  // ✅ 價格圖才有差值 dataset
   if (chart.data.datasets.length > 2) {
+    const latestSpot = chart.data.datasets[0].data.at(-1);
+    const latestNear = chart.data.datasets[1].data.at(-1);
+
     if (latestSpot !== null && latestNear !== null) {
       const diffPercent = ((latestSpot - latestNear) / latestNear) * 100;
       chart.data.datasets[2].data.push(diffPercent);
@@ -151,7 +164,19 @@ window.addEventListener('DOMContentLoaded', () => {
     chart.data.labels.shift();
     chart.data.datasets.forEach(ds => ds.data.shift());
   }
+
+  // ✅ 自動更新正確的 Y 軸範圍
+  if (chart === priceChart) {
+    updateYAxisRange(chart, [0, 1]); // 價格圖 → 現貨 + 近一
+  } else if (chart === changeChart) {
+    updateYAxisRange(chart, [0, 1]); // 漲跌圖 → 現貨 + 近一
+  } else if (chart === percentChart) {
+    updateYAxisRange(chart, [0, 1]); // 百分比圖 → 現貨 + 近一
+  }
+
+  chart.update();
 }
+
 
 
   // 第一組：現貨
