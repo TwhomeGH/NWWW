@@ -171,10 +171,10 @@ const MAX_TABLE_ROWS = 20; // 表格最多顯示 20 筆
 
 
 function getStepSize(range) {
-  if (range <= 20) {
+  if (range <= 2) {
     // 小範圍 → 刻度細一點，顯示大約 10~20 個
     return Math.ceil(range / 10);
-  } else if (range <= 100) {
+  } else if (range <= 10) {
     // 中等範圍 → 顯示大約 10 個
     return Math.ceil(range / 10);
   } else {
@@ -199,12 +199,9 @@ function pushData(chart, label, value1, value2, paddingRatio) {
   if (validData.length > 0) {
     const minVal = Math.min(...validData);
     const maxVal = Math.max(...validData);
-    let range = maxVal - minVal || 1;
+    let range = maxVal - minVal || 20;
 
-    // 如果差異太小，強制放大
-    if (range < 5) range = 20;   // ✅ 小差異強制展開 20
-    // 如果差異太大，限制最大範圍
-    if (range > 200) range = 50;
+    
 
     chart.options.scales.y.min = minVal - (range * paddingRatio);
     chart.options.scales.y.max = maxVal + (range * paddingRatio);
@@ -227,9 +224,9 @@ window.api.onFutureData((data) => {
   const now = new Date().toLocaleTimeString();
   console.log("第一組資料:", data);
 
-  pushData(priceChart, now, data.price, priceChart.data.datasets[1].data.at(-1) ?? null, 1.5);
-  pushData(changeChart, now, data.change, changeChart.data.datasets[1].data.at(-1) ?? null, 1.5);
-  pushData(percentChart, now, data.changePercent, percentChart.data.datasets[1].data.at(-1) ?? null, 1.5);
+  pushData(priceChart, now, data.price, priceChart.data.datasets[1].data.at(-1) ?? null, 0.15);
+  pushData(changeChart, now, data.change, changeChart.data.datasets[1].data.at(-1) ?? null, 0.15);
+  pushData(percentChart, now, data.changePercent, percentChart.data.datasets[1].data.at(-1) ?? null, 0.15);
 
 
   updateRawTable('台指期現貨', now, data);
@@ -241,9 +238,9 @@ window.api.onFutureDataNT2((data) => {
   const now = new Date().toLocaleTimeString();
   console.log("第二組資料:", data);
 
-  pushData(priceChart, now, priceChart.data.datasets[0].data.at(-1) ?? null, data.price, 1.5);
-  pushData(changeChart, now, changeChart.data.datasets[0].data.at(-1) ?? null, data.change, 1.5);
-  pushData(percentChart, now, percentChart.data.datasets[0].data.at(-1) ?? null, data.changePercent, 1.5);
+  pushData(priceChart, now, priceChart.data.datasets[0].data.at(-1) ?? null, data.price, 0.15);
+  pushData(changeChart, now, changeChart.data.datasets[0].data.at(-1) ?? null, data.change, 0.15);
+  pushData(percentChart, now, percentChart.data.datasets[0].data.at(-1) ?? null, data.changePercent, 0.15);
 
   updateRawTable('台指期近一', now, data);
 });
