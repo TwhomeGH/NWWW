@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self';
                script-src * 'unsafe-inline' 'unsafe-eval';
                style-src 'self' 'unsafe-inline';
@@ -27,16 +28,13 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
-        .chart-container {
-            flex: 2;
-            /* 每個 chart 平均分配高度 */
-            min-height: 150px;
-            /* 設定最小高度，避免太小看不清楚 */
-            box-sizing: border-box;
-            padding: 5px;
-            overflow: hidden;
-            /* 避免 canvas 超出容器 */
-        }
+       .chart-container {
+        flex: 1;              /* 每個 chart 平均分配剩餘高度 */
+        min-height: 200px;    /* 設定最小高度，避免太扁 */
+        max-height: 40vh;     /* 避免過高，保持自適應 */
+        box-sizing: border-box;
+        padding: 5px;
+      }
 
 
         canvas {
@@ -77,6 +75,8 @@
 /* 原始數值板塊容器 */
 .raw-data {
   flex: 1; /* ✅ 原始數值區塊佔比較少空間 */
+  min-height: 120px; /* 保證表格不會太小 */
+  max-height: 25vh;  /* 保持自適應 */
  
   padding: 10px;
   border-top: 2px solid #ccc;
